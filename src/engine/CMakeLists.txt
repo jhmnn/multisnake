@@ -1,6 +1,7 @@
 set(target_name engine)
 
 add_library(${target_name} STATIC
+  engine/time.hpp
   engine/input.hpp
   engine/input.cpp
 )
