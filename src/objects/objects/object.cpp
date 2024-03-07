@@ -1,5 +1,7 @@
 #include <objects/object.hpp>
 
+#include <level/collision.hpp>
+
 #include <ncurses.h>
 
 uint32_t free_id = 0;
@@ -55,6 +57,7 @@ void Object::move_x(int step) {
   const int nstep = step >= 0 ? 1 : -1;
   for (int i = 0; i < tstep; i++) {
     position_x_ += nstep;
+    Collision::intersects(this);
   }
 }
 
@@ -63,6 +66,7 @@ void Object::move_y(int step) {
   const int nstep = step > 0 ? 1 : (step < 0 ? -1 : 0);
   for (int i = 0; i < tstep; i++) {
     position_y_ += nstep;
+    Collision::intersects(this);
   }
 }
 
