@@ -9,7 +9,7 @@
 
 Spawner::Spawner(Level *level) {
   apple_ = level->spawn_object<Object>();
-  apple_->set_layer(Layer::Apple);
+  apple_->set_layer(LAYER_APPLE);
   apple_->set_sprite(APPLE_SPRITE);
   apple_->set_active(false);
 }

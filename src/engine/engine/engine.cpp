@@ -3,9 +3,14 @@
 #include <engine/input.hpp>
 #include <engine/time.hpp>
 
+#include <cstdlib>
 #include <ncurses.h>
 
-Engine::Engine() { init_screen(); }
+Engine::Engine() {
+  std::srand(static_cast<int>(Time::time()));
+
+  init_screen();
+}
 
 Engine::~Engine() { endwin(); }
 

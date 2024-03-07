@@ -7,11 +7,17 @@
 
 Player::Player(Level *level) {
   level_ = level;
-  
-  layer_ = Layer::Player;
+
+  layer_ = LAYER_PLAYER;
 }
 
-// void Player::on_collision(Object &obj) { }
+void Player::on_collision(Object *obj) {
+  if (obj->get_layer() == LAYER_APPLE) {
+    increase_size(1);
+  } else if (obj->get_layer() == LAYER_PLAYER) {
+    die();
+  }
+}
 
 void Player::input(Input::Key key) {
   previous_direction_x_ = direction_x_;
@@ -37,8 +43,13 @@ void Player::input(Input::Key key) {
 }
 
 void Player::update_head() {
-  move_x(direction_x_ * 2);
-  move_y(direction_y_);
+  if (direction_x_ != 0) {
+    move_x(direction_x_ * 2);
+    sprite_ = PLAYER_HEAD_SPRITE_X;
+  } else {
+    move_y(direction_y_);
+    sprite_ = PLAYER_HEAD_SPRITE_Y;
+  }
 }
 
 void Player::update_body() {
@@ -94,7 +105,7 @@ void Player::increase_size(std::size_t count) {
   } else {
     for (std::size_t i = 0; i < count; ++i) {
       parts_.push_back(level_->spawn_object<Object>());
-      parts_.back()->set_layer(Layer::Player);
+      parts_.back()->set_layer(LAYER_PLAYER);
       parts_.back()->set_sprite(PLAYER_BODY_SPRITE);
       parts_.back()->set_color(color_);
     }
@@ -131,4 +142,10 @@ void Player::reset() {
 
 void Player::die() { is_alive_ = false; }
 
-void Player::update() { update_movement(); }
+void Player::update() {
+  if (!is_alive_) {
+    return;
+  }
+
+  update_movement();
+}
