@@ -5,6 +5,8 @@ add_library(${target_name} STATIC
   objects/object.cpp
   objects/player.hpp
   objects/player.cpp
+  objects/spawner.hpp
+  objects/spawner.cpp
 )
 
 include(CompileOptions)
