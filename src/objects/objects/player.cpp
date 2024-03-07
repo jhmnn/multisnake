@@ -1,10 +1,15 @@
 #include <objects/player.hpp>
 
+#include <constants.hpp>
 #include <engine/input.hpp>
 #include <engine/time.hpp>
 #include <level/level.hpp>
 
-Player::Player(Level *level) { level_ = level; }
+Player::Player(Level *level) {
+  level_ = level;
+  
+  layer_ = Layer::Player;
+}
 
 // void Player::on_collision(Object &obj) { }
 
@@ -89,8 +94,8 @@ void Player::increase_size(std::size_t count) {
   } else {
     for (std::size_t i = 0; i < count; ++i) {
       parts_.push_back(level_->spawn_object<Object>());
-      // parts_.back()->set_layer(0);
-      parts_.back()->set_sprite('o');
+      parts_.back()->set_layer(Layer::Player);
+      parts_.back()->set_sprite(PLAYER_BODY_SPRITE);
       parts_.back()->set_color(color_);
     }
 

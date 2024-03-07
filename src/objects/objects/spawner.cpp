@@ -1,5 +1,6 @@
 #include <objects/spawner.hpp>
 
+#include <constants.hpp>
 #include <level/collision.hpp>
 #include <level/level.hpp>
 #include <objects/object.hpp>
@@ -8,7 +9,8 @@
 
 Spawner::Spawner(Level *level) {
   apple_ = level->spawn_object<Object>();
-  // apple_->set_layer(2);
+  apple_->set_layer(Layer::Apple);
+  apple_->set_sprite(APPLE_SPRITE);
   apple_->set_active(false);
 }
 
