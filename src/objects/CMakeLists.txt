@@ -3,6 +3,8 @@ set(target_name objects)
 add_library(${target_name} STATIC
   objects/object.hpp
   objects/object.cpp
+  objects/player.hpp
+  objects/player.cpp
 )
 
 include(CompileOptions)
@@ -17,4 +19,6 @@ target_include_directories(
 target_link_libraries(
   ${target_name}
   PRIVATE
+    engine
+    level
 )
