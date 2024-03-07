@@ -27,7 +27,7 @@ public:
   void update() override;
 
 private:
-  void on_collision(Object &obj) override;
+  void on_collision(Object *obj) override;
 
   void input(Input::Key key);
   void update_head();

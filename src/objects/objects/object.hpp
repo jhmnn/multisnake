@@ -44,7 +44,7 @@ public:
   void draw() const;
 
 private:
-  virtual void on_collision(Object &obj);
+  virtual void on_collision(Object *obj);
 
 protected:
   uint32_t id_{};
