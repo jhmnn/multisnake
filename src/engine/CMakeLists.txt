@@ -1,9 +1,11 @@
 set(target_name engine)
 
 add_library(${target_name} STATIC
-  engine/time.hpp
+  engine/engine.hpp
+  engine/engine.cpp
   engine/input.hpp
   engine/input.cpp
+  engine/time.hpp
 )
 
 include(CompileOptions)
