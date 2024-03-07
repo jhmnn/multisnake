@@ -3,6 +3,8 @@ set(target_name level)
 add_library(${target_name} STATIC
   level/level.hpp
   level/level.cpp
+  level/collision.hpp
+  level/collision.cpp
 )
 
 include(CompileOptions)
