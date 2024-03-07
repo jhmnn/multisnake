@@ -38,7 +38,7 @@ private:
   std::vector<std::shared_ptr<Object>> parts_;
   std::size_t active_parts_{0};
 
-  Level *level_;
+  Level *level_{};
 
   bool is_alive_{true};
   bool is_playable_{true};
