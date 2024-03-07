@@ -2,7 +2,11 @@
 
 #include <cstdint>
 
+class Collision;
+
 class Object {
+  friend class Collision;
+
 public:
   Object();
   virtual ~Object() = default;
