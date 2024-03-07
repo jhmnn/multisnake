@@ -56,7 +56,7 @@ Checks: >
   -readability-function-cognitive-complexity,
   -readability-redundant-access-specifiers
 WarningsAsErrors: '*'
-HeaderFilterRegex: '(engine|game|objects|utils|world|net)/'
+HeaderFilterRegex: '(engine|objects)/'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            jhmnn
