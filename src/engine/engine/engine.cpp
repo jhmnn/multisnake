@@ -93,7 +93,11 @@ void Engine::update() {
 
 void Engine::update_net() {}
 
-void Engine::draw() const { level_->draw(); }
+void Engine::draw() const {
+  clear();
+  
+  level_->draw();
+}
 
 void Engine::run() {
   Time::dt_ = 1.0 / 60;
