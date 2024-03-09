@@ -6,6 +6,7 @@
 #include <level/level.hpp>
 #include <objects/object.hpp>
 #include <objects/player.hpp>
+#include <objects/spawner.hpp>
 
 #include <cstdlib>
 
@@ -17,6 +18,7 @@ Engine::Engine() {
   init_screen();
   init_level();
   init_players();
+  init_spawner();
 }
 
 Engine::~Engine() { endwin(); }
@@ -29,11 +31,11 @@ void Engine::init_screen() {
   curs_set(0);
   start_color();
 
-  init_pair(1, COLOR_BLUE, COLOR_BLACK);
-  init_pair(2, COLOR_RED, COLOR_BLACK);
-  init_pair(3, COLOR_YELLOW, COLOR_BLACK);
-  init_pair(4, COLOR_MAGENTA, COLOR_BLACK);
-  init_pair(5, COLOR_GREEN, COLOR_BLACK);
+  init_pair(COLOR_PLAYER_FIRST, COLOR_BLUE, COLOR_BLACK);
+  init_pair(COLOR_PLAYER_SECOND, COLOR_RED, COLOR_BLACK);
+  init_pair(COLOR_PLAYER_THIRD, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(COLOR_PLAYER_FOURTH, COLOR_MAGENTA, COLOR_BLACK);
+  init_pair(COLOR_APPLE, COLOR_GREEN, COLOR_BLACK);
 }
 
 void Engine::init_level() {
@@ -67,12 +69,18 @@ void Engine::init_level() {
 void Engine::init_players() {
   for (int i = 0; i < 1; i++) {
     auto player = level_->spawn_object<Player>(level_.get());
-    player->set_color(COLOR_PAIR(i + 1));
+    player->set_color(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
     player->set_playable(false);
     players_.push_back(player);
   }
 
   players_[0]->set_playable(true);
+}
+
+void Engine::init_spawner() {
+  spawner_ = level_->spawn_object<Spawner>(level_.get());
+  spawner_->set_position(-500, -500);
+  spawner_->set_spawn_zone(0, 0, LEVEL_SIZE_Y, LEVEL_SIZE_X - 2);
 }
 
 void Engine::input() {

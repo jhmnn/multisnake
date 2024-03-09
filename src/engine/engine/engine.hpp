@@ -5,6 +5,7 @@
 
 class Level;
 class Player;
+class Spawner;
 
 class Engine {
 public:
@@ -17,6 +18,7 @@ private:
   void init_screen();
   void init_level();
   void init_players();
+  void init_spawner();
 
   void input();
   void update();
@@ -31,4 +33,5 @@ private:
   std::unique_ptr<Level> level_{};
 
   std::vector<std::shared_ptr<Player>> players_;
+  std::shared_ptr<Spawner> spawner_;
 };
