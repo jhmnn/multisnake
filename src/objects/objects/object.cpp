@@ -4,9 +4,11 @@
 
 #include <ncurses.h>
 
-uint32_t free_id = 0;
+uint32_t Object::free_id_{0};
 
 Object::Object() { id_ = free_id_++; }
+
+void Object::on_collision(Object *obj) { obj->get_id(); }
 
 uint32_t Object::get_id() const { return id_; }
 
@@ -69,6 +71,8 @@ void Object::move_y(int step) {
     Collision::intersects(this);
   }
 }
+
+void Object::update() {}
 
 void Object::draw() const {
   mvaddch(position_y_, position_x_, sprite_ | color_);

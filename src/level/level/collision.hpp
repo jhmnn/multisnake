@@ -6,6 +6,8 @@
 class Object;
 class Level;
 
+using Objects = std::vector<std::shared_ptr<Object>>;
+
 class Collision {
   friend class Level;
 
@@ -13,5 +15,5 @@ public:
   static Object *intersects(Object *obj);
 
 private:
-  static std::vector<std::shared_ptr<Object>> objects_;
+  static std::shared_ptr<Objects> objects_;
 };

@@ -5,6 +5,8 @@
 
 class Object;
 
+using Objects = std::vector<std::shared_ptr<Object>>;
+
 class Level {
 public:
   Level();
@@ -16,7 +18,7 @@ public:
         "T must be a derived of Object class");
 
     std::shared_ptr<T> obj = std::make_shared<T>(args...);
-    objects_.push_back(obj);
+    objects_->push_back(obj);
 
     return obj;
   }
@@ -27,5 +29,5 @@ public:
   void draw() const;
 
 public:
-  std::vector<std::shared_ptr<Object>> objects_;
+  std::shared_ptr<Objects> objects_;
 };

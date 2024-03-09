@@ -2,8 +2,10 @@
 
 #include <objects/object.hpp>
 
+std::shared_ptr<Objects> Collision::objects_{};
+
 Object *Collision::intersects(Object *obj) {
-  for (auto const &target : objects_) {
+  for (auto const &target : *objects_) {
     if (target->get_id() == obj->get_id()) {
       continue;
     }
