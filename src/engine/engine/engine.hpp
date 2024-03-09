@@ -32,6 +32,6 @@ private:
 
   std::unique_ptr<Level> level_{};
 
-  std::vector<std::shared_ptr<Player>> players_;
-  std::shared_ptr<Spawner> spawner_;
+  std::vector<std::shared_ptr<Player>> players_{};
+  std::shared_ptr<Spawner> spawner_{};
 };

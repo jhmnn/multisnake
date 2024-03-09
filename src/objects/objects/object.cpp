@@ -10,6 +10,8 @@ Object::Object() { id_ = free_id_++; }
 
 void Object::on_collision(Object *obj) { obj->get_id(); }
 
+void Object::on_spawn() {}
+
 uint32_t Object::get_id() const { return id_; }
 
 void Object::set_active(bool state) { is_active_ = state; }

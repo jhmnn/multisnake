@@ -3,9 +3,11 @@
 #include <cstdint>
 
 class Collision;
+class Level;
 
 class Object {
   friend class Collision;
+  friend class Level;
 
 public:
   Object();
@@ -45,6 +47,7 @@ public:
 
 private:
   virtual void on_collision(Object *obj);
+  virtual void on_spawn();
 
 protected:
   uint32_t id_{};

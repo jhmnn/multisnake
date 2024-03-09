@@ -9,18 +9,20 @@ Player::Player(Level *level) {
   level_ = level;
 
   layer_ = LAYER_PLAYER;
-
-  parts_.push_back(level_->get_object<Object>(id_));
-
-  reset();
 }
 
 void Player::on_collision(Object *obj) {
   if (obj->get_layer() == LAYER_APPLE) {
     increase_size(1);
+    obj->set_active(false);
   } else if (obj->get_layer() == LAYER_PLAYER) {
     die();
   }
+}
+
+void Player::on_spawn() {
+  parts_.push_back(level_->get_object<Object>(id_));
+  reset();
 }
 
 void Player::input(Input::Key key) {
@@ -62,7 +64,7 @@ void Player::update_body() {
   int current_direction_x{};
   int current_direction_y{};
 
-  for (std::size_t i = 1; i < parts_.size(); ++i) {
+  for (std::size_t i = 1; i < active_parts_; ++i) {
     auto &part = parts_[i - 1];
 
     new_position_x = part->get_position_x() - part->get_direction_x() * 2;
@@ -75,6 +77,9 @@ void Player::update_body() {
     previous_direction_x_ = current_direction_x;
     previous_direction_y_ = current_direction_y;
   }
+
+  previous_direction_x_ = direction_x_;
+  previous_direction_y_ = direction_y_;
 }
 
 void Player::update_movement() {
@@ -134,6 +139,8 @@ void Player::set_size(std::size_t count) {
 
     active_parts_ = count;
   }
+
+  update_body();
 }
 
 void Player::reset() {
@@ -148,6 +155,8 @@ void Player::reset() {
 
   direction_x_ = 1;
   direction_y_ = 0;
+
+  active_parts_ = 1;
 }
 
 void Player::die() { is_alive_ = false; }

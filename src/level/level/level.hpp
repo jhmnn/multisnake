@@ -17,10 +17,13 @@ public:
         std::is_base_of<Object, T>::value,
         "T must be a derived of Object class");
 
-    std::shared_ptr<T> obj = std::make_shared<T>(args...);
-    objects_->push_back(obj);
+    std::shared_ptr<T> tobj = std::make_shared<T>(args...);
 
-    return obj;
+    const std::shared_ptr<Object> obj = std::dynamic_pointer_cast<Object, T>(tobj);
+    objects_->push_back(obj);
+    obj->on_spawn();
+
+    return tobj;
   }
 
   template <class T> std::shared_ptr<T> get_object(uint32_t id) {
