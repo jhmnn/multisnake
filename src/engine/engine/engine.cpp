@@ -1,15 +1,20 @@
 #include <engine/engine.hpp>
 
+#include <constants.hpp>
 #include <engine/input.hpp>
 #include <engine/time.hpp>
+#include <level/level.hpp>
+#include <objects/object.hpp>
 
 #include <cstdlib>
+
 #include <ncurses.h>
 
 Engine::Engine() {
   std::srand(static_cast<int>(Time::time()));
 
   init_screen();
+  init_level();
 }
 
 Engine::~Engine() { endwin(); }
@@ -29,6 +34,34 @@ void Engine::init_screen() {
   init_pair(5, COLOR_GREEN, COLOR_BLACK);
 }
 
+void Engine::init_level() {
+  level_ = std::make_unique<Level>();
+
+  for (int i = 0; i < LEVEL_SIZE_X; i += 2) {
+    auto obj = level_->spawn_object<Object>();
+    obj->set_sprite('*');
+    obj->set_position(i, 0);
+    obj->set_layer(1);
+
+    obj = level_->spawn_object<Object>();
+    obj->set_sprite('*');
+    obj->set_position(i, LEVEL_SIZE_Y);
+    obj->set_layer(1);
+  }
+
+  for (int i = 1; i < LEVEL_SIZE_Y; ++i) {
+    auto obj = level_->spawn_object<Object>();
+    obj->set_sprite('*');
+    obj->set_position(0, i);
+    obj->set_layer(1);
+
+    obj = level_->spawn_object<Object>();
+    obj->set_sprite('*');
+    obj->set_position(LEVEL_SIZE_X - 2, i);
+    obj->set_layer(1);
+  }
+}
+
 void Engine::input() {
   if (Input::is_pressed(Input::Key::Q)) {
     is_stopped_ = true;
@@ -41,11 +74,13 @@ void Engine::update() {
   if (is_over_) {
     return;
   }
+
+  level_->update();
 }
 
 void Engine::update_net() {}
 
-void Engine::draw() const {}
+void Engine::draw() const { level_->draw(); }
 
 void Engine::run() {
   Time::dt_ = 1.0 / 60;
