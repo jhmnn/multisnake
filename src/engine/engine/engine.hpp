@@ -21,6 +21,7 @@ private:
   void input();
   void update();
   void update_net();
+  void update_bounds();
   void draw() const;
 
 private:
