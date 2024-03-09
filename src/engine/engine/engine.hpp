@@ -1,8 +1,10 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 class Level;
+class Player;
 
 class Engine {
 public:
@@ -14,6 +16,7 @@ public:
 private:
   void init_screen();
   void init_level();
+  void init_players();
 
   void input();
   void update();
@@ -25,4 +28,6 @@ private:
   bool is_over_{false};
 
   std::unique_ptr<Level> level_{};
+
+  std::vector<std::shared_ptr<Player>> players_;
 };

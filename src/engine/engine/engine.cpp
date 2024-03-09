@@ -5,6 +5,7 @@
 #include <engine/time.hpp>
 #include <level/level.hpp>
 #include <objects/object.hpp>
+#include <objects/player.hpp>
 
 #include <cstdlib>
 
@@ -15,6 +16,7 @@ Engine::Engine() {
 
   init_screen();
   init_level();
+  init_players();
 }
 
 Engine::~Engine() { endwin(); }
@@ -41,25 +43,36 @@ void Engine::init_level() {
     auto obj = level_->spawn_object<Object>();
     obj->set_sprite('*');
     obj->set_position(i, 0);
-    obj->set_layer(1);
+    obj->set_layer(LAYER_DEFUALT);
 
     obj = level_->spawn_object<Object>();
     obj->set_sprite('*');
     obj->set_position(i, LEVEL_SIZE_Y);
-    obj->set_layer(1);
+    obj->set_layer(LAYER_DEFUALT);
   }
 
   for (int i = 1; i < LEVEL_SIZE_Y; ++i) {
     auto obj = level_->spawn_object<Object>();
     obj->set_sprite('*');
     obj->set_position(0, i);
-    obj->set_layer(1);
+    obj->set_layer(LAYER_DEFUALT);
 
     obj = level_->spawn_object<Object>();
     obj->set_sprite('*');
     obj->set_position(LEVEL_SIZE_X - 2, i);
-    obj->set_layer(1);
+    obj->set_layer(LAYER_DEFUALT);
   }
+}
+
+void Engine::init_players() {
+  for (int i = 0; i < 1; i++) {
+    auto player = level_->spawn_object<Player>(level_.get());
+    player->set_color(COLOR_PAIR(i + 1));
+    player->set_playable(false);
+    players_.push_back(player);
+  }
+
+  players_[0]->set_playable(true);
 }
 
 void Engine::input() {

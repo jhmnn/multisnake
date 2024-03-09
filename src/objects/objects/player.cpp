@@ -9,6 +9,10 @@ Player::Player(Level *level) {
   level_ = level;
 
   layer_ = LAYER_PLAYER;
+
+  parts_.push_back(level_->get_object<Object>(id_));
+
+  reset();
 }
 
 void Player::on_collision(Object *obj) {
@@ -134,8 +138,14 @@ void Player::set_size(std::size_t count) {
 
 void Player::reset() {
   set_size(1);
+
   is_alive_ = true;
+
   sprite_ = 'c';
+
+  move_interval_ = 0.09;
+  move_timer_ = 0.0;
+
   direction_x_ = 1;
   direction_y_ = 0;
 }
