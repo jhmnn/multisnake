@@ -1,7 +1,6 @@
 #include <level/level.hpp>
 
 #include <level/collision.hpp>
-#include <objects/object.hpp>
 
 Level::Level() {
   objects_ = std::make_shared<Objects>();
