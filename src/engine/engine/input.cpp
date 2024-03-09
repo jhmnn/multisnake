@@ -2,6 +2,10 @@
 
 #include <ncurses.h>
 
+uint32_t Input::keys_states_{0};
+std::vector<Input::Key> Input::pressed_{};
+Input::Key Input::pressed_last_{Key::Unknown};
+
 Input::Key Input::keycode_to_key(int kc) {
   switch (kc) {
   case 'w':
@@ -30,7 +34,7 @@ std::vector<Input::Key> &Input::pressed() { return pressed_; }
 Input::Key Input::pressed_last() { return pressed_last_; }
 
 void Input::input() {
-  current_key_ = keycode_to_key(getch());
+  const Key current_key_ = keycode_to_key(getch());
   keys_states_ |= (1 << static_cast<int>(current_key_));
   pressed_last_ = current_key_;
   if (current_key_ != Key::Unknown) {

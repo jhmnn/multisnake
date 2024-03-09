@@ -19,7 +19,6 @@ public:
 
 private:
   static uint32_t keys_states_;
-  static Key current_key_;
   static std::vector<Key> pressed_;
   static Key pressed_last_;
 

@@ -6,6 +6,7 @@ add_library(${target_name} STATIC
   engine/input.hpp
   engine/input.cpp
   engine/time.hpp
+  engine/time.cpp
 )
 
 include(CompileOptions)

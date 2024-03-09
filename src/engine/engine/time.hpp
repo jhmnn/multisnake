@@ -7,14 +7,10 @@ class Engine;
 class Time {
   friend class Engine;
 
+public:
+  static double dt();
+  static double time();
+
 private:
   static double dt_;
-
-public:
-  static double dt() { return dt_; }
-  static double time() {
-    return std::chrono::duration<double>(
-               std::chrono::system_clock::now().time_since_epoch())
-        .count();
-  }
 };
