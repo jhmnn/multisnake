@@ -26,9 +26,6 @@ void Player::on_spawn() {
 }
 
 void Player::input(Input::Key key) {
-  previous_direction_x_ = direction_x_;
-  previous_direction_y_ = direction_y_;
-
   if (key == Input::Key::W && direction_y_ == 0) {
     direction_x_ = 0;
     direction_y_ = -1;
@@ -49,6 +46,9 @@ void Player::input(Input::Key key) {
 }
 
 void Player::update_head() {
+  previous_position_x_ = position_x_;
+  previous_position_y_ = position_y_;
+
   if (direction_x_ != 0) {
     move_x(direction_x_ * 2);
     sprite_ = PLAYER_HEAD_SPRITE_X;
@@ -61,25 +61,18 @@ void Player::update_head() {
 void Player::update_body() {
   int new_position_x{};
   int new_position_y{};
-  int current_direction_x{};
-  int current_direction_y{};
 
   for (std::size_t i = 1; i < active_parts_; ++i) {
-    auto &part = parts_[i - 1];
-
-    new_position_x = part->get_position_x() - part->get_direction_x() * 2;
-    new_position_y = part->get_position_y() - part->get_direction_y();
-    current_direction_x = parts_[i]->get_direction_x();
-    current_direction_y = parts_[i]->get_direction_y();
+    new_position_x = previous_position_x_;
+    new_position_y = previous_position_y_;
+    previous_position_x_ = parts_[i]->get_position_x();
+    previous_position_y_ = parts_[i]->get_position_y();
 
     parts_[i]->set_position(new_position_x, new_position_y);
-    parts_[i]->set_direction(previous_direction_x_, previous_direction_y_);
-    previous_direction_x_ = current_direction_x;
-    previous_direction_y_ = current_direction_y;
   }
 
-  previous_direction_x_ = direction_x_;
-  previous_direction_y_ = direction_y_;
+  previous_position_x_ = position_x_;
+  previous_position_y_ = position_y_;
 }
 
 void Player::update_movement() {

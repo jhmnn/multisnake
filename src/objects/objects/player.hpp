@@ -47,6 +47,6 @@ private:
   double move_interval_{};
   double move_timer_{};
 
-  int previous_direction_x_{};
-  int previous_direction_y_{};
+  int previous_position_x_{};
+  int previous_position_y_{};
 };
