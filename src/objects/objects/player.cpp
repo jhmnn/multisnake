@@ -94,13 +94,18 @@ void Player::set_playable(bool state) { is_playable_ = state; }
 
 bool Player::is_playable() const { return is_playable_; }
 
+void Player::set_spawn_position(int x, int y) {
+  spawn_position_x_ = x;
+  spawn_position_y_ = y;
+}
+
 void Player::increase_size(std::size_t count) {
   if (count == 0) {
     return;
   }
 
   if (parts_.size() - active_parts_ >= count) {
-    const auto new_size = parts_.size() + count;
+    const auto new_size = active_parts_ + count;
     for (; active_parts_ < new_size; ++active_parts_) {
       parts_[active_parts_]->set_active(true);
     }
@@ -145,6 +150,9 @@ void Player::reset() {
 
   move_interval_ = 0.09;
   move_timer_ = 0.0;
+
+  position_x_ = spawn_position_x_;
+  position_y_ = spawn_position_y_;
 
   direction_x_ = 1;
   direction_y_ = 0;

@@ -10,13 +10,12 @@ class Spawner : public Object {
 public:
   explicit Spawner(Level *level);
 
+  void spawn();
+
   void set_spawn_zone(
       int up_bound, int left_bound, int bottom_bound, int right_bound);
 
   void update() override;
-
-private:
-  void spawn();
 
 private:
   std::shared_ptr<Object> apple_;

@@ -17,6 +17,8 @@ public:
   void set_playable(bool state);
   bool is_playable() const;
 
+  void set_spawn_position(int x, int y);
+
   void increase_size(std::size_t count);
   void set_size(std::size_t count);
 
@@ -46,6 +48,9 @@ private:
 
   double move_interval_{};
   double move_timer_{};
+
+  int spawn_position_x_{0};
+  int spawn_position_y_{0};
 
   int previous_position_x_{};
   int previous_position_y_{};

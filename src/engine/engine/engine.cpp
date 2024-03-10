@@ -19,6 +19,8 @@ Engine::Engine() {
   init_level();
   init_players();
   init_spawner();
+
+  reset();
 }
 
 Engine::~Engine() { endwin(); }
@@ -70,6 +72,7 @@ void Engine::init_players() {
   for (int i = 0; i < 1; i++) {
     auto player = level_->spawn_object<Player>(level_.get());
     player->set_color(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
+    player->set_spawn_position(4, 3 * (i + 1));
     player->set_playable(false);
     players_.push_back(player);
   }
@@ -83,13 +86,40 @@ void Engine::init_spawner() {
   spawner_->set_spawn_zone(0, 0, LEVEL_SIZE_Y, LEVEL_SIZE_X - 2);
 }
 
+void Engine::reset() {
+  for (auto &player : players_) {
+    player->reset();
+  }
+
+  spawner_->spawn();
+
+  is_over_ = false;
+}
+
 void Engine::input() {
   if (Input::is_pressed(Input::Key::Q)) {
     is_stopped_ = true;
+  } else if (Input::is_pressed(Input::Key::R)) {
+    if (is_over_) {
+      reset();
+    }
   }
 }
 
 void Engine::update_net() {}
+
+void Engine::update_over() {
+  std::size_t alive{0};
+  for (auto &player : players_) {
+    if (player->is_alive()) {
+      ++alive;
+    }
+  }
+
+  if (alive == 0) {
+    is_over_ = true;
+  }
+}
 
 void Engine::update_bounds() {
   for (auto &player : players_) {
@@ -119,6 +149,7 @@ void Engine::update() {
   level_->update();
 
   update_bounds();
+  update_over();
 }
 
 void Engine::draw() const {

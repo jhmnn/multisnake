@@ -20,9 +20,12 @@ private:
   void init_players();
   void init_spawner();
 
+  void reset();
+
   void input();
   void update();
   void update_net();
+  void update_over();
   void update_bounds();
   void draw() const;
 
