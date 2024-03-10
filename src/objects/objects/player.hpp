@@ -19,6 +19,12 @@ public:
 
   void set_spawn_position(int x, int y);
 
+  void set_direction(int x, int y);
+  void set_direction_x(int value);
+  void set_direction_y(int value);
+  int get_direction_x() const;
+  int get_direction_y() const;
+
   void increase_size(std::size_t count);
   void set_size(std::size_t count);
 
@@ -54,4 +60,7 @@ private:
 
   int previous_position_x_{};
   int previous_position_y_{};
+
+  int direction_x_{1};
+  int direction_y_{0};
 };

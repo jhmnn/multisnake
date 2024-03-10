@@ -24,12 +24,6 @@ public:
   int get_position_x() const;
   int get_position_y() const;
 
-  void set_direction(int x, int y);
-  void set_direction_x(int value);
-  void set_direction_y(int value);
-  int get_direction_x() const;
-  int get_direction_y() const;
-
   void set_sprite(char sprite);
   char get_sprite() const;
 
@@ -56,9 +50,6 @@ protected:
 
   int position_x_{0};
   int position_y_{0};
-
-  int direction_x_{1};
-  int direction_y_{0};
 
   char sprite_{' '};
   uint32_t color_{0};

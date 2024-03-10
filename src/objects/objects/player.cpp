@@ -99,6 +99,19 @@ void Player::set_spawn_position(int x, int y) {
   spawn_position_y_ = y;
 }
 
+void Player::set_direction(int x, int y) {
+  direction_x_ = x;
+  direction_y_ = y;
+}
+
+void Player::set_direction_x(int value) { direction_x_ = value; }
+
+void Player::set_direction_y(int value) { direction_y_ = value; }
+
+int Player::get_direction_x() const { return direction_x_; }
+
+int Player::get_direction_y() const { return direction_y_; }
+
 void Player::increase_size(std::size_t count) {
   if (count == 0) {
     return;

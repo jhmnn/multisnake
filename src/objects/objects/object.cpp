@@ -31,19 +31,6 @@ int Object::get_position_x() const { return position_x_; }
 
 int Object::get_position_y() const { return position_y_; }
 
-void Object::set_direction(int x, int y) {
-  direction_x_ = x;
-  direction_y_ = y;
-}
-
-void Object::set_direction_x(int value) { direction_x_ = value; }
-
-void Object::set_direction_y(int value) { direction_y_ = value; }
-
-int Object::get_direction_x() const { return direction_x_; }
-
-int Object::get_direction_y() const { return direction_y_; }
-
 void Object::set_sprite(char sprite) { sprite_ = sprite; }
 
 char Object::get_sprite() const { return sprite_; }
