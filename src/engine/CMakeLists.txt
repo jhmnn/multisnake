@@ -24,5 +24,6 @@ target_link_libraries(
   PRIVATE
     level
     objects
+    network
     ncurses
 )

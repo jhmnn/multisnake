@@ -76,9 +76,11 @@ void Player::update_body() {
 }
 
 void Player::update_movement() {
-  if (is_playable_) {
-    input(Input::pressed_last());
+  if (!is_playable_) {
+    return;
   }
+
+  input(Input::pressed_last());
 
   if (Time::time() - move_timer_ > move_interval_) {
     update_head();
@@ -87,6 +89,8 @@ void Player::update_movement() {
     move_timer_ = Time::time();
   }
 }
+
+void Player::set_alive(bool state) { is_alive_ = state; }
 
 bool Player::is_alive() const { return is_alive_; }
 

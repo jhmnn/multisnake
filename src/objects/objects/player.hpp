@@ -15,6 +15,7 @@ class Player : public Object {
 public:
   explicit Player(Level *level);
 
+  void set_alive(bool state);
   bool is_alive() const;
 
   void set_playable(bool state);

@@ -4,6 +4,9 @@
 #include <engine/input.hpp>
 #include <engine/time.hpp>
 #include <level/level.hpp>
+#include <network/client.hpp>
+#include <network/network.hpp>
+#include <network/server.hpp>
 #include <objects/object.hpp>
 #include <objects/player.hpp>
 #include <objects/spawner.hpp>
@@ -17,10 +20,7 @@ Engine::Engine() {
 
   init_screen();
   init_level();
-  init_players();
   init_spawner();
-
-  reset();
 }
 
 Engine::~Engine() { endwin(); }
@@ -69,7 +69,8 @@ void Engine::init_level() {
 }
 
 void Engine::init_players() {
-  for (int i = 0; i < 1; i++) {
+  const int members = static_cast<int>(network_->members());
+  for (int i = 0; i < members; ++i) {
     auto player = level_->spawn_object<Player>(level_.get());
     player->set_color(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
     player->set_spawn_position(4, 3 * (i + 1));
@@ -77,7 +78,7 @@ void Engine::init_players() {
     players_.push_back(player);
   }
 
-  players_[0]->set_playable(true);
+  players_[network_->id()]->set_playable(true);
 }
 
 void Engine::init_spawner() {
@@ -94,6 +95,7 @@ void Engine::reset() {
   spawner_->spawn();
 
   is_over_ = false;
+  is_reset_ = false;
 }
 
 void Engine::input() {
@@ -101,12 +103,14 @@ void Engine::input() {
     is_stopped_ = true;
   } else if (Input::is_pressed(Input::Key::R)) {
     if (is_over_) {
-      reset();
+      is_reset_ = true;
+    }
+
+    if (is_paused_) {
+      is_paused_ = false;
     }
   }
 }
-
-void Engine::update_net() {}
 
 void Engine::update_over() {
   std::size_t alive{0};
@@ -116,7 +120,7 @@ void Engine::update_over() {
     }
   }
 
-  if (alive == 0) {
+  if (alive <= 1) {
     is_over_ = true;
   }
 }
@@ -139,10 +143,116 @@ void Engine::update_bounds() {
   }
 }
 
+void Engine::update_accept() {
+  network_->accept();
+
+  network_->add_field(is_paused_);
+  network_->send();
+
+  if (!is_paused_) {
+    init_players();
+    reset();
+    update_network_ = [this]() { update_server(); };
+  }
+}
+
+void Engine::update_connect() {
+  network_->recv();
+  is_paused_ = network_->next_field();
+
+  if (!is_paused_) {
+    init_players();
+    reset();
+    update_network_ = [this]() { update_client(); };
+  }
+}
+
+void Engine::update_server() {
+  network_->recv();
+
+  for (std::size_t i = 0; i < players_.size() - 1; ++i) {
+    const int id = network_->next_field();
+    players_[id]->set_alive(network_->next_field());
+    players_[id]->set_sprite(static_cast<char>(network_->next_field()));
+
+    const std::size_t previous_size = players_[id]->get_size();
+    players_[id]->set_size(network_->next_field());
+    if (previous_size != players_[id]->get_size()) {
+      spawner_->spawn();
+    }
+
+    for (std::size_t j = 0; j < players_[id]->get_size(); ++j) {
+      players_[id]->parts_[j]->set_position_x(network_->next_field());
+      players_[id]->parts_[j]->set_position_y(network_->next_field());
+    }
+  }
+
+  network_->add_field(is_over_);
+  network_->add_field(is_reset_);
+
+  if (is_reset_) {
+    reset();
+  }
+
+  for (auto &player : players_) {
+    network_->add_field(player->get_sprite());
+    network_->add_field(player->get_size());
+    for (std::size_t i = 0; i < player->get_size(); ++i) {
+      network_->add_field(player->parts_[i]->get_position_x());
+      network_->add_field(player->parts_[i]->get_position_y());
+    }
+  }
+
+  network_->add_field(spawner_->apple_->get_position_x());
+  network_->add_field(spawner_->apple_->get_position_y());
+
+  network_->send();
+}
+
+void Engine::update_client() {
+  const std::size_t id = network_->id();
+  network_->add_field(id);
+  network_->add_field(players_[id]->is_alive());
+  network_->add_field(players_[id]->get_sprite());
+  network_->add_field(players_[id]->get_size());
+  for (std::size_t i = 0; i < players_[id]->get_size(); ++i) {
+    network_->add_field(players_[id]->parts_[i]->get_position_x());
+    network_->add_field(players_[id]->parts_[i]->get_position_y());
+  }
+
+  network_->send();
+
+  network_->recv();
+
+  is_over_ = network_->next_field();
+  is_reset_ = network_->next_field();
+
+  if (is_reset_) {
+    reset();
+  }
+
+  for (auto &player : players_) {
+    player->set_sprite(static_cast<char>(network_->next_field()));
+    player->set_size(network_->next_field());
+    for (std::size_t i = 0; i < player->get_size(); ++i) {
+      player->parts_[i]->set_position_x(network_->next_field());
+      player->parts_[i]->set_position_y(network_->next_field());
+    }
+  }
+
+  spawner_->apple_->set_position_x(network_->next_field());
+  spawner_->apple_->set_position_y(network_->next_field());
+  spawner_->apple_->set_active(true);
+}
+
 void Engine::update() {
   input();
 
   if (is_over_) {
+    return;
+  }
+
+  if (is_paused_) {
     return;
   }
 
@@ -152,13 +262,32 @@ void Engine::update() {
   update_over();
 }
 
+void Engine::draw_ui() const {
+  std::string msg = "PLAYERS " + std::to_string(network_->members());
+  mvaddstr(0, 1, msg.c_str());
+
+  mvaddstr(0, LEVEL_SIZE_X + 1, "<SCORES>");
+  for (std::size_t i = 0; i < players_.size(); ++i) {
+    msg = "PLAYER " + std::to_string(i + 1) + ": " +
+        std::to_string((players_[i]->get_size() - 1) * 10);
+    attron(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
+    mvaddstr(2 + i, LEVEL_SIZE_X + 1, msg.c_str());
+    attroff(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
+  }
+
+  mvaddstr(LEVEL_SIZE_Y - 2, LEVEL_SIZE_X + 1, "W/A/S/D - SNAKE CONTROL");
+  mvaddstr(LEVEL_SIZE_Y - 1, LEVEL_SIZE_X + 1, "R       - (RE)START GAME");
+  mvaddstr(LEVEL_SIZE_Y, LEVEL_SIZE_X + 1, "Q       - QUIT GAME");
+}
+
 void Engine::draw() const {
   clear();
 
   level_->draw();
+  draw_ui();
 }
 
-void Engine::run() {
+void Engine::main_loop() {
   Time::dt_ = 1.0 / 60;
 
   const double ms_per_update = Time::dt();
@@ -171,7 +300,7 @@ void Engine::run() {
 
   double frame_lag = 0;
 
-  const double tick_rate_ = 1.0 / 30;
+  const double tick_rate_ = 1.0 / 60;
   double last_net_update = 0;
 
   while (!is_stopped_) {
@@ -186,7 +315,7 @@ void Engine::run() {
       Input::update();
 
       if (Time::time() - last_net_update > tick_rate_) {
-        update_net();
+        update_network_();
         last_net_update = Time::time();
       }
 
@@ -202,4 +331,21 @@ void Engine::run() {
 
     draw();
   }
+}
+
+void Engine::run_server() {
+  network_ = std::make_unique<Server>();
+  update_network_ = [this]() { update_accept(); };
+
+  main_loop();
+}
+
+void Engine::run_client(std::string_view ip, std::string_view port) {
+  network_ = std::make_unique<Client>();
+  network_->connect(ip, port);
+  update_network_ = [this]() { update_connect(); };
+
+  spawner_->set_active(false);
+
+  main_loop();
 }
