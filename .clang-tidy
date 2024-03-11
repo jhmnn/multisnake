@@ -54,9 +54,10 @@ Checks: >
   -cppcoreguidelines-non-private-member-variables-in-classes,
   -readability-redundant-smartptr-get,
   -readability-function-cognitive-complexity,
-  -readability-redundant-access-specifiers
+  -readability-redundant-access-specifiers,
+  -misc-unused-parameters
 WarningsAsErrors: '*'
-HeaderFilterRegex: '(engine|objects|level)/'
+HeaderFilterRegex: '(engine|objects|level|network)/'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            jhmnn

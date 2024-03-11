@@ -4,9 +4,12 @@
 
 #include <memory>
 
+class Engine;
 class Level;
 
 class Spawner : public Object {
+  friend class Engine;
+
 public:
   explicit Spawner(Level *level);
 

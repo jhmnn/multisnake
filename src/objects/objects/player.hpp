@@ -6,9 +6,12 @@
 #include <memory>
 #include <vector>
 
+class Engine;
 class Level;
 
 class Player : public Object {
+  friend class Engine;
+
 public:
   explicit Player(Level *level);
 
@@ -27,6 +30,7 @@ public:
 
   void increase_size(std::size_t count);
   void set_size(std::size_t count);
+  std::size_t get_size() const;
 
   void reset();
 

@@ -117,7 +117,7 @@ void Player::increase_size(std::size_t count) {
     return;
   }
 
-  if (parts_.size() - active_parts_ >= count) {
+  if (count <= parts_.size() - active_parts_) {
     const auto new_size = active_parts_ + count;
     for (; active_parts_ < new_size; ++active_parts_) {
       parts_[active_parts_]->set_active(true);
@@ -137,22 +137,22 @@ void Player::increase_size(std::size_t count) {
 }
 
 void Player::set_size(std::size_t count) {
-  if (count == 0) {
+  if (count == 0 || count == active_parts_) {
     return;
   }
 
-  if (parts_.size() < count) {
-    increase_size(parts_.size() - count);
-  } else if (parts_.size() > count) {
-    for (std::size_t i = parts_.size() - 1; i >= count; --i) {
-      parts_[i]->set_active(false);
+  if (count > active_parts_) {
+    increase_size(count - active_parts_);
+  } else {
+    for (; active_parts_ > count;) {
+      parts_[--active_parts_]->set_active(false);
     }
-
-    active_parts_ = count;
   }
 
   update_body();
 }
+
+std::size_t Player::get_size() const { return active_parts_; }
 
 void Player::reset() {
   set_size(1);
@@ -161,7 +161,7 @@ void Player::reset() {
 
   sprite_ = 'c';
 
-  move_interval_ = 0.09;
+  move_interval_ = 0.11;
   move_timer_ = 0.0;
 
   position_x_ = spawn_position_x_;
