@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-inline constexpr int LEVEL_SIZE_X = 80;
+inline constexpr int LEVEL_SIZE_X = 70;
 inline constexpr int LEVEL_SIZE_Y = 30;
 
 inline constexpr char PLAYER_HEAD_SPRITE_X = 'c';
