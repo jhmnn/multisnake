@@ -54,7 +54,7 @@ bool Client::recv() {
   if (recvfrom(
           sd_, recv_buf_.data(), buf_size_, 0,
           reinterpret_cast<sockaddr *>(&server_.addr), &server_.len) < 0) {
-    exit(EXIT_FAILURE);
+    return false;
   }
 
   current_field_ = 0;

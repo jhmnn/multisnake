@@ -157,7 +157,7 @@ void Engine::update_accept() {
 }
 
 void Engine::update_connect() {
-  network_->recv();
+  is_recv_success_ = network_->recv();
   is_paused_ = network_->next_field();
 
   if (!is_paused_) {
@@ -168,7 +168,10 @@ void Engine::update_connect() {
 }
 
 void Engine::update_server() {
-  network_->recv();
+  is_recv_success_ = network_->recv();
+  if (!is_recv_success_) {
+    return;
+  }
 
   for (std::size_t i = 0; i < players_.size() - 1; ++i) {
     const int id = network_->next_field();
@@ -222,7 +225,10 @@ void Engine::update_client() {
 
   network_->send();
 
-  network_->recv();
+  is_recv_success_ = network_->recv();
+  if (!is_recv_success_) {
+    return;
+  }
 
   is_over_ = network_->next_field();
   is_reset_ = network_->next_field();
@@ -316,6 +322,11 @@ void Engine::main_loop() {
 
       if (Time::time() - last_net_update > tick_rate_) {
         update_network_();
+        if (!is_recv_success_) {
+          is_stopped_ = true;
+          break;
+        }
+
         last_net_update = Time::time();
       }
 

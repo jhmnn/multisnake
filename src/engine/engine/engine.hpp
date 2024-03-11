@@ -27,7 +27,7 @@ private:
   void reset();
 
   void input();
-  
+
   void update();
   void update_over();
   void update_bounds();
@@ -53,6 +53,7 @@ private:
   std::shared_ptr<Spawner> spawner_{};
 
   std::unique_ptr<Network> network_;
+  bool is_recv_success_{true};
 
   std::function<void()> update_network_{};
 };

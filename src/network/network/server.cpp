@@ -20,6 +20,14 @@ Server::Server() {
     exit(EXIT_FAILURE);
   }
 
+  timeval time{};
+  time.tv_sec = 1;
+  time.tv_usec = 0;
+
+  setsockopt(
+      sd_, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<char *>(&time),
+      sizeof(time));
+
   entrance_.len = sizeof(entrance_.addr);
 
   recv_buf_.resize(buf_size_ * max_clients_);
@@ -73,9 +81,11 @@ bool Server::recv() {
 
   for (auto &client : clients_) {
     std::memset(recv_buf_.data(), '\0', buf_size_ * max_clients_);
-    recvfrom(
-        sd_, recv_buf_.data() + offset, buf_size_, 0,
-        reinterpret_cast<sockaddr *>(&client.addr), &client.len);
+    if (recvfrom(
+            sd_, recv_buf_.data() + offset, buf_size_, 0,
+            reinterpret_cast<sockaddr *>(&client.addr), &client.len) < 0) {
+      return false;
+    }
 
     offset += buf_size_;
   }
