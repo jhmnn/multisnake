@@ -73,7 +73,7 @@ void Engine::init_players() {
   for (int i = 0; i < members; ++i) {
     auto player = level_->spawn_object<Player>(level_.get());
     player->set_color(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
-    player->set_spawn_position(4, 3 * (i + 1));
+    player->set_spawn_position(4, 6 * (i + 1));
     player->set_playable(false);
     players_.push_back(player);
   }
@@ -203,6 +203,7 @@ void Engine::update_server() {
   }
 
   for (auto &player : players_) {
+    network_->add_field(player->is_alive());
     network_->add_field(player->get_sprite());
     network_->add_field(player->get_size());
     for (std::size_t i = 0; i < player->get_size(); ++i) {
@@ -243,6 +244,7 @@ void Engine::update_client() {
   }
 
   for (auto &player : players_) {
+    player->set_alive(network_->next_field());
     player->set_sprite(static_cast<char>(network_->next_field()));
     player->set_size(network_->next_field());
     for (std::size_t i = 0; i < player->get_size(); ++i) {
@@ -280,15 +282,21 @@ void Engine::draw_ui() const {
   mvaddstr(0, LEVEL_SIZE_X + 1, "<SCORES>");
   for (std::size_t i = 0; i < players_.size(); ++i) {
     msg = "PLAYER " + std::to_string(i + 1) + ": " +
-        std::to_string((players_[i]->get_size() - 1) * 10);
+        std::to_string((players_[i]->get_size() - 3) * 10);
     attron(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
     mvaddstr(2 + i, LEVEL_SIZE_X + 1, msg.c_str());
     attroff(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
+
+    if (!players_[i]->is_alive()) {
+      mvaddstr(2 + i, LEVEL_SIZE_X + 11, "WASTED");
+    }
   }
 
-  mvaddstr(LEVEL_SIZE_Y - 2, LEVEL_SIZE_X + 1, "W/A/S/D - SNAKE CONTROL");
-  mvaddstr(LEVEL_SIZE_Y - 1, LEVEL_SIZE_X + 1, "R       - (RE)START GAME");
-  mvaddstr(LEVEL_SIZE_Y, LEVEL_SIZE_X + 1, "Q       - QUIT GAME");
+  mvaddstr(LEVEL_SIZE_Y, LEVEL_SIZE_X + 1, "W/A/S/D - SNAKE CONTROL");
+  mvaddstr(LEVEL_SIZE_Y - 1, LEVEL_SIZE_X + 1, "Q       - QUIT GAME");
+  if (network_->id() == 0) {
+    mvaddstr(LEVEL_SIZE_Y - 2, LEVEL_SIZE_X + 1, "R       - (RE)START GAME");
+  }
 }
 
 void Engine::draw() const {
