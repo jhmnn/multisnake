@@ -56,9 +56,8 @@ bool Server::accept() {
   return true;
 }
 
-bool Server::connect(std::string_view ip, std::string_view port) {
+bool Server::connect(std::string_view ip) {
   ip = "";
-  port = "";
   return false;
 }
 

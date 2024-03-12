@@ -14,7 +14,7 @@ public:
   Server();
 
   bool accept() override;
-  bool connect(std::string_view ip, std::string_view port) override;
+  bool connect(std::string_view ip) override;
 
   bool send() override;
   bool recv() override;

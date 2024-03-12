@@ -15,14 +15,14 @@ Client::Client() {
 
 bool Client::accept() { return false; }
 
-bool Client::connect(std::string_view ip, std::string_view port) {
+bool Client::connect(std::string_view ip) {
   server_.len = sizeof(server_.addr);
 
   std::memset(&server_.addr, 0, server_.len);
 
   server_.addr.sin_family = AF_INET;
 
-  server_.addr.sin_port = htons(strtol(port.data(), nullptr, 10));
+  server_.addr.sin_port = 48683;
   if (inet_pton(AF_INET, ip.data(), &server_.addr.sin_addr) != 1) {
     std::cerr << "Invalid server IP\n";
     exit(EXIT_FAILURE);

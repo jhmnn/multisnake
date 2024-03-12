@@ -11,7 +11,7 @@ public:
   virtual ~Network();
 
   virtual bool accept() = 0;
-  virtual bool connect(std::string_view ip, std::string_view port) = 0;
+  virtual bool connect(std::string_view ip) = 0;
 
   void add_field(int value);
   void add_field(char value);

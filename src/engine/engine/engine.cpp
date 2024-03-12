@@ -364,9 +364,9 @@ void Engine::run_server() {
   main_loop();
 }
 
-void Engine::run_client(std::string_view ip, std::string_view port) {
+void Engine::run_client(std::string_view ip) {
   network_ = std::make_unique<Client>();
-  network_->connect(ip, port);
+  network_->connect(ip);
   update_network_ = [this]() { update_connect(); };
 
   spawner_->set_active(false);

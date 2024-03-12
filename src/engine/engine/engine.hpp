@@ -16,7 +16,7 @@ public:
   ~Engine();
 
   void run_server();
-  void run_client(std::string_view ip, std::string_view port);
+  void run_client(std::string_view ip);
 
 private:
   void init_screen();
