@@ -30,7 +30,7 @@ Server::Server() {
 
   entrance_.len = sizeof(entrance_.addr);
 
-  recv_buf_.resize(buf_size_ * max_clients_);
+  recv_buf_.resize(buf_size_ * max_clients_, '\0');
 }
 
 bool Server::accept() {
@@ -40,21 +40,20 @@ bool Server::accept() {
 
   if (recvfrom(
           sd_, recv_buf_.data(), buf_size_, MSG_DONTWAIT,
-          reinterpret_cast<sockaddr *>(&entrance_.addr), &entrance_.len) > 0) {
-
-    clients_.push_back(entrance_);
-
-    add_field(members());
-    add_field(clients_.size());
-    sendto(
-        sd_, send_buf_.data(), buf_size_, 0,
-        reinterpret_cast<const sockaddr *>(&entrance_.addr), entrance_.len);
-    send_buf_.clear();
-
-    return true;
+          reinterpret_cast<sockaddr *>(&entrance_.addr), &entrance_.len) <= 0) {
+    return false;
   }
 
-  return false;
+  clients_.push_back(entrance_);
+
+  add_field(members());
+  add_field(clients_.size());
+  sendto(
+      sd_, send_buf_.data(), buf_size_, 0,
+      reinterpret_cast<const sockaddr *>(&entrance_.addr), entrance_.len);
+  send_buf_.clear();
+
+  return true;
 }
 
 bool Server::connect(std::string_view ip, std::string_view port) {
@@ -64,7 +63,7 @@ bool Server::connect(std::string_view ip, std::string_view port) {
 }
 
 bool Server::send() {
-  send_buf_.insert(0, std::to_string(members()) + '.');
+  send_buf_.insert(0, ':' + std::to_string(members()) + '.');
   for (auto &client : clients_) {
     sendto(
         sd_, send_buf_.data(), buf_size_, 0,
@@ -79,15 +78,15 @@ bool Server::send() {
 bool Server::recv() {
   std::size_t offset{0};
 
+  std::memset(recv_buf_.data(), '\0', buf_size_ * max_clients_);
   for (auto &client : clients_) {
-    std::memset(recv_buf_.data(), '\0', buf_size_ * max_clients_);
     if (recvfrom(
             sd_, recv_buf_.data() + offset, buf_size_, 0,
             reinterpret_cast<sockaddr *>(&client.addr), &client.len) < 0) {
       return false;
     }
 
-    offset += buf_size_;
+    offset = recv_buf_.find('\0', offset);
   }
 
   current_field_ = 0;

@@ -90,6 +90,7 @@ void Engine::init_spawner() {
 void Engine::reset() {
   for (auto &player : players_) {
     player->reset();
+    player->set_size(3);
   }
 
   spawner_->spawn();
@@ -126,20 +127,24 @@ void Engine::update_over() {
 }
 
 void Engine::update_bounds() {
-  for (auto &player : players_) {
-    if (player->get_position_x() == 0) {
-      player->set_position(LEVEL_SIZE_X - 5, player->get_position_y());
-      player->move_x(1);
-    } else if (player->get_position_x() == LEVEL_SIZE_X - 2) {
-      player->set_position(3, player->get_position_y());
-      player->move_x(-1);
-    } else if (player->get_position_y() == 0) {
-      player->set_position(player->get_position_x(), LEVEL_SIZE_Y - 2);
-      player->move_y(1);
-    } else if (player->get_position_y() == LEVEL_SIZE_Y) {
-      player->set_position(player->get_position_x(), 2);
-      player->move_y(-1);
-    }
+  const std::size_t id = network_->id();
+  if (id >= players_.size()) {
+    return;
+  }
+
+  auto &player = players_[id];
+  if (player->get_position_x() == 0) {
+    player->set_position(LEVEL_SIZE_X - 5, player->get_position_y());
+    player->move_x(1);
+  } else if (player->get_position_x() == LEVEL_SIZE_X - 2) {
+    player->set_position(3, player->get_position_y());
+    player->move_x(-1);
+  } else if (player->get_position_y() == 0) {
+    player->set_position(player->get_position_x(), LEVEL_SIZE_Y - 2);
+    player->move_y(1);
+  } else if (player->get_position_y() == LEVEL_SIZE_Y) {
+    player->set_position(player->get_position_x(), 2);
+    player->move_y(-1);
   }
 }
 

@@ -150,6 +150,7 @@ void Player::set_size(std::size_t count) {
   } else {
     for (; active_parts_ > count;) {
       parts_[--active_parts_]->set_active(false);
+      parts_[active_parts_]->set_position(-500, -500);
     }
   }
 

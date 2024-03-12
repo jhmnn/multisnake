@@ -22,10 +22,11 @@ Network::~Network() { close(sd_); }
 void Network::add_field(int value) {
   const std::string field = std::to_string(value);
 
-  if (send_buf_.size() + field.size() > buf_size_) {
+  if (send_buf_.size() + field.size() + 2 > buf_size_) {
     return;
   }
 
+  send_buf_ += ':';
   send_buf_ += field;
   send_buf_ += '.';
 }
@@ -39,12 +40,13 @@ void Network::add_field(std::size_t value) {
 int Network::next_field() {
   std::string field{};
 
-  const std::size_t field_end = recv_buf_.find('.', current_field_);
+  const std::size_t field_start = recv_buf_.find(':', current_field_) + 1;
+  const std::size_t field_end = recv_buf_.find('.', field_start);
   if (field_end == std::string::npos) {
     return -1;
   }
 
-  field = recv_buf_.substr(current_field_, field_end - current_field_);
+  field = recv_buf_.substr(field_start, field_end - field_start);
   current_field_ = field_end + 1;
 
   return static_cast<int>(std::strtol(field.c_str(), nullptr, 10));
