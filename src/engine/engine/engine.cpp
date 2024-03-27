@@ -11,6 +11,7 @@
 #include <objects/player.hpp>
 #include <objects/spawner.hpp>
 
+#include <algorithm>
 #include <cstdlib>
 
 #include <ncurses.h>
@@ -285,17 +286,37 @@ void Engine::draw_ui() const {
   std::string msg = "PLAYERS " + std::to_string(network_->members());
   mvaddstr(0, 1, msg.c_str());
 
-  mvaddstr(0, LEVEL_SIZE_X + 1, "<SCORES>");
-  for (std::size_t i = 0; i < players_.size(); ++i) {
-    msg = "PLAYER " + std::to_string(i + 1) + ": " +
-        std::to_string((players_[i]->get_size() - 3) * 10);
-    attron(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
-    mvaddstr(2 + i, LEVEL_SIZE_X + 1, msg.c_str());
-    attroff(COLOR_PAIR(COLOR_PLAYER_FIRST + i));
+  std::vector<std::pair<std::size_t, std::size_t>> players_scores{};
 
-    if (!players_[i]->is_alive()) {
-      mvaddstr(2 + i, LEVEL_SIZE_X + 11, "WASTED");
+  for (std::size_t i = 0; i < players_.size(); ++i) {
+    std::pair<std::size_t, std::size_t> tmp;
+    tmp.first = (players_[i]->get_size() - 3) * 10;
+    tmp.second = i;
+
+    players_scores.push_back(tmp);
+  }
+
+  auto cmp = [](std::pair<std::size_t, std::size_t> const &x,
+                std::pair<std::size_t, std::size_t> const &y) {
+    return x.first > y.first;
+  };
+
+  std::sort(players_scores.begin(), players_scores.end(), cmp);
+
+  int count{0};
+
+  mvaddstr(0, LEVEL_SIZE_X + 1, "<SCORES>");
+  for (const auto &[score, id] : players_scores) {
+    msg = "PLAYER " + std::to_string(id + 1) + ": " + std::to_string(score);
+    attron(COLOR_PAIR(COLOR_PLAYER_FIRST + id));
+    mvaddstr(2 + count, LEVEL_SIZE_X + 1, msg.c_str());
+    attroff(COLOR_PAIR(COLOR_PLAYER_FIRST + id));
+
+    if (!players_[id]->is_alive()) {
+      mvaddstr(2 + count, LEVEL_SIZE_X + 11, "WASTED");
     }
+
+    ++count;
   }
 
   mvaddstr(LEVEL_SIZE_Y, LEVEL_SIZE_X + 1, "W/A/S/D - SNAKE CONTROL");
