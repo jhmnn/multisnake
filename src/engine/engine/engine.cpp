@@ -121,8 +121,14 @@ void Engine::update_over() {
     }
   }
 
-  if (alive <= 1) {
-    is_over_ = true;
+  if (players_.size() == 1) {
+    if (alive == 0) {
+      is_over_ = true;
+    }
+  } else {
+    if (alive <= 1) {
+      is_over_ = true;
+    }
   }
 }
 
